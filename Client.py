@@ -7,6 +7,10 @@ import threading
 import select
 import traceback
 
+# a biblioteca abaixo será para serializar e de-serializar a chave e o 
+# vetor de inicialização que será passado aos clientes
+import pickle
+
 
 class Server(threading.Thread):
     def initialise(self, receive):
@@ -49,7 +53,12 @@ class Client(threading.Thread):
         print("Conectando\n")
         s = ''
         self.connect(host, port)
-        print("Conectado\n")
+
+        # após a conexão, o cliente recebe a chave de criptografia do servidor
+        # esta será a chave que ficará responsável por encriptar as mensagens 
+        # entre clientes 
+        output = pickle.loads(self.sock.recv(1024))
+
         user_name = input("Digite o nome do usuário a ser utilizado:\n>>")
         receive = self.sock
         time.sleep(1)

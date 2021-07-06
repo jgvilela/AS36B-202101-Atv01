@@ -1,15 +1,35 @@
 #! /usr/bin/env python
-
 import socket
 import sys
 import traceback
 import threading
 import select
 
+# as bibliotecas abaixo foram importadas para suportar a criptografia AES
+# e a biblioteca "os" é para poder gerar um número aleatório
+from Crypto.Cipher import AES
+import hashlib
+import os
+
+# já a biblioteca abaixo será para serializar e de-serializar a chave e o 
+# vetor de inicialização que será passado aos clientes
+import pickle
+
 SOCKET_LIST = []
 TO_BE_SENT = []
 SENT_BY = {}
 
+# abaixo uma senha é feita, apra que seja criada a chave de criptografia
+# que dará conta de criptografar todas as mensagens entre os usuários
+senha = "AS36BS3gur4nc4&4ud1t0r14d3S1st3m4s".encode()
+chave = hashlib.sha256(senha).digest()
+vetor_inicializacao = os.urandom(16)
+
+cryptoItems = {}
+type(cryptoItems)
+cryptoItems['chave'] = chave
+cryptoItems['vetor_inicializacao'] = vetor_inicializacao
+output = pickle.dumps(cryptoItems)
 
 class Server(threading.Thread):
 
@@ -29,6 +49,7 @@ class Server(threading.Thread):
                 if sock == self.sock:
                     sockfd, addr = self.sock.accept()
                     print(str(addr))
+                    sockfd.send(output)
 
                     SOCKET_LIST.append(sockfd)
                     print(SOCKET_LIST[len(SOCKET_LIST) - 1])
