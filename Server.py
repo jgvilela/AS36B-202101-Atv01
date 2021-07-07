@@ -27,8 +27,8 @@ vetor_inicializacao = os.urandom(16)
 
 cryptoItems = {}
 type(cryptoItems)
-cryptoItems['chave'] = chave
-cryptoItems['vetor_inicializacao'] = vetor_inicializacao
+cryptoItems['c'] = chave
+cryptoItems['v'] = vetor_inicializacao
 output = pickle.dumps(cryptoItems)
 
 class Server(threading.Thread):
