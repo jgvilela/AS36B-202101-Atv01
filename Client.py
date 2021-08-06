@@ -9,7 +9,7 @@ import traceback
 
 # as bibliotecas abaixo foram importadas para suportar a criptografia AES
 # e a biblioteca "os" é para poder gerar um número aleatório
-from Crypto.Cipher import AES
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 # a biblioteca unidecode "normaliza" a mensagem para que a mesma não 
 # contenha acentos. Isso porquê quando o caracter ascii tem acentos
@@ -35,7 +35,7 @@ class Server(threading.Thread):
                     s = item.recv(1024)
                     if s != '':
                         chunk = s
-                        print(cifra.decrypt(chunk).rstrip().decode() + '\n>>')
+                        print(cifra.decryptor(chunk).rstrip().decode() + '\n>>')
                 except:
                     traceback.print_exc(file=sys.stdout)
                     break
@@ -81,9 +81,8 @@ class Client(threading.Thread):
         # logo após receber a chave de criptografia e o vetor de inicializacao
         # criamos a varíavel de modo de criptografia e criamos o objeto que será
         # usado para criptografar e descriptografar a mensagem entre clientes
-        modo = AES.MODE_CBC
         global cifra
-        cifra = AES.new(output['c'], modo, output['v'])
+        cifra = Cipher(algorithms.AES(output['c']), modes.CBC(output['v']))
 
         user_name = input("Digite o nome do usuário a ser utilizado:\n>>")
         receive = self.sock
@@ -112,7 +111,7 @@ class Client(threading.Thread):
             # aqui é chamada a função de padronização, para que a mensagem
             # tenha tamanho múltiplo de 16
             msg_padronizada = self.padronizacao_mensagem(msg)
-            data = cifra.encrypt(msg_padronizada)
+            data = cifra.encryptor(msg_padronizada)
 
             #data = msg.encode()
             self.client(host, port, data)
