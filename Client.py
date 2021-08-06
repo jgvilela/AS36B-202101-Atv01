@@ -35,7 +35,8 @@ class Server(threading.Thread):
                     s = item.recv(1024)
                     if s != '':
                         chunk = s
-                        print(cifra.decryptor(chunk).rstrip().decode() + '\n>>')
+                        decryptor = cifra.decryptor()
+                        print(decryptor.update(chunk).rstrip().decode() + decryptor.finalize() + '\n>>')
                 except:
                     traceback.print_exc(file=sys.stdout)
                     break
@@ -63,8 +64,10 @@ class Client(threading.Thread):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         try:
-            host = input("Digite o IP do servidor:\n>>")
-            port = int(input("Digite a porta de conexão ao servidor:\n>>"))
+            #host = input("Digite o IP do servidor:\n>>")
+            #port = int(input("Digite a porta de conexão ao servidor:\n>>"))
+            host = '192.168.0.197'
+            port = 5535
         except EOFError:
             print("Erro")
             return 1
@@ -82,6 +85,8 @@ class Client(threading.Thread):
         # criamos a varíavel de modo de criptografia e criamos o objeto que será
         # usado para criptografar e descriptografar a mensagem entre clientes
         global cifra
+        print(output['c'])
+        print(output['v'])
         cifra = Cipher(algorithms.AES(output['c']), modes.CBC(output['v']))
 
         user_name = input("Digite o nome do usuário a ser utilizado:\n>>")
@@ -111,7 +116,8 @@ class Client(threading.Thread):
             # aqui é chamada a função de padronização, para que a mensagem
             # tenha tamanho múltiplo de 16
             msg_padronizada = self.padronizacao_mensagem(msg)
-            data = cifra.encryptor(msg_padronizada)
+            encryptor = cifra.encryptor()
+            data = encryptor.update(bytes(msg_padronizada,'utf-8')) + encryptor.finalize()
 
             #data = msg.encode()
             self.client(host, port, data)
