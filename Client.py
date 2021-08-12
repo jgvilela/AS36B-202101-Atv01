@@ -34,9 +34,9 @@ class Server(threading.Thread):
                 try:
                     s = item.recv(1024)
                     if s != '':
-                        chunk = s
                         decryptor = cifra.decryptor()
-                        print(decryptor.update(chunk).rstrip().decode() + decryptor.finalize() + '\n>>')
+                        message = decryptor.update(s) + decryptor.finalize()
+                        print(message.decode().rstrip() + '\n>>')
                 except:
                     traceback.print_exc(file=sys.stdout)
                     break
@@ -117,7 +117,7 @@ class Client(threading.Thread):
             # tenha tamanho múltiplo de 16
             msg_padronizada = self.padronizacao_mensagem(msg)
             encryptor = cifra.encryptor()
-            data = encryptor.update(bytes(msg_padronizada,'utf-8')) + encryptor.finalize()
+            data = encryptor.update(str.encode(msg_padronizada)) + encryptor.finalize()
 
             #data = msg.encode()
             self.client(host, port, data)
