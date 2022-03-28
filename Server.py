@@ -7,7 +7,7 @@ import select
 
 # as bibliotecas abaixo foram importadas para suportar a criptografia AES
 # e a biblioteca "os" é para poder gerar um número aleatório
-from Crypto.Cipher import AES
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import hashlib
 import os
 
@@ -21,8 +21,7 @@ SENT_BY = {}
 
 # abaixo uma senha é feita, apra que seja criada a chave de criptografia
 # que dará conta de criptografar todas as mensagens entre os usuários
-senha = "AS36BS3gur4nc4&4ud1t0r14d3S1st3m4s".encode()
-chave = hashlib.sha256(senha).digest()
+chave = os.urandom(32)
 vetor_inicializacao = os.urandom(16)
 
 cryptoItems = {}
